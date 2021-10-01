@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def gradient_decent(X: np.array, y: np.array, weight: float, bias: float, n_iterations: int, learning_rate: float) -> tuple:
+def gradient_decent(X: np.array, y: np.array, weight: float, bias: float, n_iterations: int, learning_rate: float, regularization = None) -> tuple:
     """
     Performs gradient descent on a given set of data points.
 
@@ -27,6 +27,10 @@ def gradient_decent(X: np.array, y: np.array, weight: float, bias: float, n_iter
         # Calculate gradient descent
         D_m = -(2 / n_features) * sum(X * (error))     # Partial Derivative for M (Weights)
         D_c = -(2 / n_features) * sum(error)           # Partial Derivative for C (Bias)
+
+        # Apply regularization
+        if regularization is not None:
+            D_m += regularization.grad(weight)
 
         # Update weights and bias
         weight -= (learning_rate * D_m)

@@ -13,21 +13,12 @@ class Regression:
     Base regression model
     '''
 
-    def __init__(self, n_iterations: int = 100, learning_rate: int = 0.001) -> None:
-        '''
-        Initialize the model hyper parameters
-
-        :param iterations: number of iterations
-        :param learning_rate: learning rate
-        '''
-
-        self.n_iterations = n_iterations
-        self.learning_rate = learning_rate
-        self.n_features = None
+    def __init__(self, regularization = None) -> None:       
 
         # Parameters
         self.bias = 0
         self.weight = []
+        self.regularization = regularization
 
         # Metrics
         self.training_mse = []
@@ -42,38 +33,6 @@ class Regression:
         '''
 
         self.weight = np.random.rand()
-
-
-    def fit(self, X: np.array, y: np.array, use_gradient_decent: bool = True) -> None:
-        '''
-        Fit the model to the training data X using Gradient Descent
-
-        :param X: input data
-        :param y: target data
-        :return: None
-        '''
-
-        self.n_features = len(X)
-
-        # Initialize weight
-        self.initialize_weight(n_features = self.n_features)
-        
-        if use_gradient_decent:
-            # Gradient descent optimizaion
-            self.weight, self.bias = gradient_decent(
-                X = X,
-                y = y,
-                weight = self.weight,
-                bias = self.bias,
-                n_iterations = self.n_iterations,
-                learning_rate = self.learning_rate,
-            )
-        else:
-            # Least squares optimizaion
-            self.weight, self.bias = least_squares_fit(
-                X = X,
-                y = y,
-            )
     
 
     def predict(self, X: np.array) -> np.array:
@@ -87,6 +46,114 @@ class Regression:
         return X.dot(self.weight) + self.bias
 
 
+class LinearRegression(Regression):
+    '''
+    Linear regression model
+    '''
+
+    def __init__(self) -> None:
+        super().__init__()
+
+
+    def fit(self, X: np.array, y: np.array) -> None:
+        '''
+        Fit the model to the training data X using Gradient Descent
+
+        :param X: training data
+        :param y: target data
+        :param use_gradient_decent: use gradient decent or least squares fit
+        :param epochs: number of epochs (Iterations) in case gradient decent is used
+        :param learning_rate: learning rate for gradient decent
+        :return: None
+        '''
+
+        # Least squares optimizaion
+        self.weight, self.bias = least_squares_fit(
+            X = X,
+            y = y,
+        )
+
+
+class LassoRegression(Regression):
+    '''
+    Lasso regression model
+    '''
+
+    def __init__(self, alpha: float) -> None:
+
+        self.regularization = L1_Regularizer(alpha)
+        super().__init__()
+    
+
+    def fit(self, X: np.array, y: np.array, epochs: int = 100, learning_rate: int = 0.0001) -> None:
+        '''
+        Fit the model to the training data X using Gradient Descent
+
+        :param X: training data
+        :param y: target data
+        :param use_gradient_decent: use gradient decent or least squares fit
+        :param epochs: number of epochs (Iterations) in case gradient decent is used
+        :param learning_rate: learning rate for gradient decent
+        :return: None
+        '''
+
+        self.epochs = epochs
+        self.learning_rate = learning_rate
+
+        # Initialize weight
+        self.initialize_weight(n_features = len(X))
+        
+        # Gradient descent optimizaion
+        self.weight, self.bias = gradient_decent(
+            X = X,
+            y = y,
+            weight = self.weight,
+            bias = self.bias,
+            n_iterations = self.epochs,
+            learning_rate = self.learning_rate,
+            regularization = self.regularization
+        )
+
+
+class RidgeRegression(Regression):
+    '''
+    Ridge regression model
+    '''
+
+    def __init__(self, alpha: float) -> None:
+
+        self.regularization = L2_Regularizer(alpha)
+        super().__init__()
+    
+
+    def fit(self, X: np.array, y: np.array, epochs: int = 100, learning_rate: int = 0.0001) -> None:
+        '''
+        Fit the model to the training data X using Gradient Descent
+
+        :param X: training data
+        :param y: target data
+        :param use_gradient_decent: use gradient decent or least squares fit
+        :param epochs: number of epochs (Iterations) in case gradient decent is used
+        :param learning_rate: learning rate for gradient decent
+        :return: None
+        '''
+
+        self.epochs = epochs
+        self.learning_rate = learning_rate
+
+        # Initialize weight
+        self.initialize_weight(n_features = len(X))
+        
+        # Gradient descent optimizaion
+        self.weight, self.bias = gradient_decent(
+            X = X,
+            y = y,
+            weight = self.weight,
+            bias = self.bias,
+            n_iterations = self.epochs,
+            learning_rate = self.learning_rate,
+            regularization = self.regularization
+        )
 
 
 if __name__ == '__main__':
@@ -99,13 +166,13 @@ if __name__ == '__main__':
     y = np.array(df.iloc[:, 1])
 
     # Split the data into training and testing sets
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, random_state = 42)
 
     # Initialize the model
-    regressor = Regression(n_iterations = 1000, learning_rate = 0.0001)
+    regressor = RidgeRegression(alpha = 0.01)
 
     # Training the model
-    regressor.fit(X_train, y_train, use_gradient_decent = False)
+    regressor.fit(X_train, y_train, epochs = 1000, learning_rate = 0.0001)
 
     # Make predictions
     y_pred = regressor.predict(X_test)
