@@ -4,9 +4,9 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 
 # Models
-from RidgeRegression import RidgeRegression
-from LassoRegression import LassoRegression
-from LinearRegression import LinearRegression
+from models.RidgeRegression import RidgeRegression
+from models.LassoRegression import LassoRegression
+from models.LinearRegression import LinearRegression
 
 
 if __name__ == '__main__':
@@ -22,7 +22,7 @@ if __name__ == '__main__':
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, random_state = 42)
 
     # Initialize the model
-    regressor = LassoRegression(alpha = 0.01)
+    regressor = RidgeRegression(alpha = 0.01)
 
     # Training the model
     regressor.fit(X_train, y_train, epochs = 1000, learning_rate = 0.0001)

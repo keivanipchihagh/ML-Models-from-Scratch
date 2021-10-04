@@ -1,34 +1,34 @@
 import numpy as np
-from Regression import Regression
+from .Regression import Regression
 
 
-class L2_Regularizer(object):
-    ''' L2 Regularizer for Ridge Regression '''
+class L1_Regularizer(object):
+    ''' L1 Regularizer for Lasso Regression '''
 
     def __init__(self, alpha: float) -> None:
         self.alpha = alpha
 
     def __call__(self, w):
-        return self.alpha * np.sum(w ** 2)
+        return self.alpha * np.sum(np.abs(w))
 
     def grad(self, w):
-        return 2 * self.alpha * w
+        return self.alpha * np.sign(w)
 
 
-class RidgeRegression(Regression):
+class LassoRegression(Regression):
     '''
-    Ridge regression model
+    Lasso regression model
     '''
 
     def __init__(self, alpha: float) -> None:
-        
+
         super().__init__()
-        self.regularization = L2_Regularizer(alpha)
+        self.regularization = L1_Regularizer(alpha)
     
 
     def fit(self, X: np.array, y: np.array, epochs: int = 100, learning_rate: int = 0.0001) -> None:
         '''
-        Fit the model to the training data X using Gradient Descent and L2 regularization
+        Fit the model to the training data X using Gradient Descent and L1 regularization
 
         :param X: training data
         :param y: target data
@@ -57,7 +57,7 @@ class RidgeRegression(Regression):
             D_m = -(2 / n_features) * sum(X * (error))     # Partial Derivative for M (Weights)
             D_c = -(2 / n_features) * sum(error)           # Partial Derivative for C (Bias)
 
-            # Apply L2 regularization (Ridge)
+            # Apply L1 regularization (Lasso)
             D_m += self.regularization.grad(self.weight)
 
             # Update weights and bias

@@ -1,5 +1,5 @@
 import numpy as np
-from Regression import Regression
+from .Regression import Regression
 
 
 class LinearRegression(Regression):
