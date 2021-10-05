@@ -20,10 +20,16 @@ class L2_Regularizer(object):
 
 class RidgeRegression(Regression):
     '''
-    Ridge regression model
+    Ridge regression model (Inherited from Regression class)
+    - L2 Regularizartion used
     '''
 
     def __init__(self, alpha: float) -> None:
+        '''
+        Initialize the model
+
+        :param alpha: L2 regularization parameter
+        '''
         
         super().__init__()
         self.regularization = L2_Regularizer(alpha)

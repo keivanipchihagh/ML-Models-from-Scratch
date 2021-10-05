@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-from collections import Counter
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 
@@ -42,7 +41,7 @@ class KNeighborsRegression:
             distance  += (abs(x[i] - y[i]) ** p)
 
         return distance ** (1 / p)
-    
+
 
     def fit(self, X: np.ndarray, y: np.ndarray) -> None:
         '''
@@ -96,14 +95,14 @@ if __name__ == '__main__':
     df = pd.read_csv('data/boston.csv')
     
     # Preparing the data
-    X = df.drop(columns = 'target')
-    y = df['target'].values
+    X = df.drop(columns = 'price')
+    y = df['price'].values
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3)
 
     # Scale the data
     scaler = StandardScaler()
     X_train = scaler.fit_transform(X_train)
-    X_test = scaler.transform(X_test)    
+    X_test = scaler.transform(X_test)
 
     # Define model
     knn = KNeighborsRegression(k = 5)

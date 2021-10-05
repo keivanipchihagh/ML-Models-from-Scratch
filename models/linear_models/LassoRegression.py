@@ -20,10 +20,16 @@ class L1_Regularizer(object):
 
 class LassoRegression(Regression):
     '''
-    Lasso regression model
+    Lasso regression model (Inherited from Regression class)
+    - L1 Regularizartion used
     '''
 
     def __init__(self, alpha: float) -> None:
+        '''
+        Initialize the model
+
+        :param alpha: L1 regularization parameter
+        '''
 
         super().__init__()
         self.regularization = L1_Regularizer(alpha)

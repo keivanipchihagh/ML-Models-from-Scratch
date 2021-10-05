@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from Regression import Regression
 from sklearn.model_selection import train_test_split
 
+
 class LinearRegression(Regression):
     '''
     Linear regression model
