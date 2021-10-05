@@ -4,33 +4,62 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 
 # Models
-from models.RidgeRegression import RidgeRegression
-from models.LassoRegression import LassoRegression
-from models.LinearRegression import LinearRegression
+from models.linear_models.RidgeRegression import RidgeRegression
+from models.linear_models.LassoRegression import LassoRegression
+from models.linear_models.LinearRegression import LinearRegression
 
 
-if __name__ == '__main__':
+def prep_data(path, test_size):
+    """
+    Prepares the data for the models.
+
+    :param path: path to the data
+    :param test_size: size of the test set
+    :return: X_train, X_test, y_train, y_test
+    """
 
     # Load the dataset
-    df = pd.read_csv('data/data.csv')
+    df = pd.read_csv(path)
     
     # Preparing the data
     X = np.array(df.iloc[:, 0])
     y = np.array(df.iloc[:, 1])
 
     # Split the data into training and testing sets
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, random_state = 42)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = test_size, random_state = 42)
+    return X_train, X_test, y_train, y_test
 
-    # Initialize the model
+
+if __name__ == '__main__':
+
+    # Prepare data
+    X_train, X_test, y_train, y_test = prep_data('data/scatter.csv', 0.3)
+
+    # ------------------------------------------------------------ LinearRegression ------------------------------------------------------------    
+
+    # Define model
+    regressor = LinearRegression()
+    regressor.fit(X_train, y_train)
+
+    # ------------------------------------------------------------ RidgeRegression ------------------------------------------------------------
+
+    # Define model
     regressor = RidgeRegression(alpha = 0.01)
-
-    # Training the model
     regressor.fit(X_train, y_train, epochs = 1000, learning_rate = 0.0001)
+
+    # ------------------------------------------------------------ LassoRegression ------------------------------------------------------------
+
+    # Define model
+    regressor = LassoRegression(alpha = 0.01)
+    regressor.fit(X_train, y_train, epochs = 1000, learning_rate = 0.0001)
+
+
+
+
+
 
     # Make predictions
     y_pred = regressor.predict(X_test)
-
-    print(regressor.weight, regressor.bias)
 
     # Plotting the results
     plt.figure(figsize = (5, 3))
