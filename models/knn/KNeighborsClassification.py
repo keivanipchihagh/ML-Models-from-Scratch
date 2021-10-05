@@ -2,8 +2,7 @@ import numpy as np
 import pandas as pd
 from collections import Counter
 from sklearn.preprocessing import StandardScaler
-
-from utilities.distances import minkowski_distance
+from sklearn.model_selection import train_test_split
 
 
 class KNeighborsClassification:
@@ -21,6 +20,30 @@ class KNeighborsClassification:
         self.p = p
     
 
+    def minkowski_distance(self, x, y, p = 1):    
+        '''
+        Calculates the Minkowski distance between two vectors x and y.
+
+        :param x: x points
+        :param y: y points
+        :param p: p is the Minkowski power parameter. (Default = 1)
+        :returns: the Minkowski distance between x and y
+        :rasies: ValueError if x and y do not have the same length    
+        '''
+
+        # Exception handling
+        if len(x) != len(y):
+            raise ValueError('x and y must be of same length')
+
+        n = len(x)
+
+        distance  = 0
+        for i in range(n):
+            distance  += (abs(x[i] - y[i]) ** p)
+
+        return distance ** (1 / p)
+    
+
     def fit(self, X: np.ndarray, y: np.ndarray) -> None:
         '''
         Fit the model for the spesific test point
@@ -31,7 +54,7 @@ class KNeighborsClassification:
         '''
 
         # Calculate distances
-        distances = [minkowski_distance(x, y, self.p) for x in X]
+        distances = [self.minkowski_distance(x, y, self.p) for x in X]
 
         # Return neighbors
         return pd.DataFrame(
@@ -66,3 +89,28 @@ class KNeighborsClassification:
             y_pred.append(preds.most_common()[0][0])
         
         return y_pred
+
+
+
+
+if __name__ == '__main__':
+
+    # Load the dataset
+    df = pd.read_csv('data/iris.csv')
+    
+    # Preparing the data
+    X = df.drop(columns = 'target')
+    y = df['target'].values
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3)
+
+    # Scale the data
+    scaler = StandardScaler()
+    X_train = scaler.fit_transform(X_train)
+    X_test = scaler.transform(X_test)    
+
+    # Define model
+    knn = KNeighborsClassification(k = 5)
+
+    # Make predictions
+    y_pred = knn.predict(X_train, X_test, y_train)
+    print(y_pred)
