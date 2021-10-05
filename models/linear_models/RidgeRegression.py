@@ -1,5 +1,8 @@
 import numpy as np
-from .Regression import Regression
+import pandas as pd
+import matplotlib.pyplot as plt
+from Regression import Regression
+from sklearn.model_selection import train_test_split
 
 
 class L2_Regularizer(object):
@@ -63,3 +66,29 @@ class RidgeRegression(Regression):
             # Update weights and bias
             self.weight -= (learning_rate * D_m)
             self.bias -= (learning_rate * D_c)
+
+
+
+if __name__ == '__main__':
+
+    # Load the dataset
+    df = pd.read_csv('data/scatter.csv')
+    
+    # Preparing the data    
+    X = np.array(df.iloc[:, 0])
+    y = np.array(df.iloc[:, 1])
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3)
+
+    # Define model
+    regressor = RidgeRegression(alpha = 0.01)
+    regressor.fit(X_train, y_train, epochs = 1000, learning_rate = 0.0001)
+
+    # Make predictions
+    y_pred = regressor.predict(X_test)
+
+    # Plotting the results
+    plt.figure(figsize = (5, 3))
+    plt.scatter(X_train, y_train , color = 'green')
+    plt.scatter(X_test, y_test , color = 'blue')
+    plt.plot(X_test , y_pred , color = 'r' , lw = 1)
+    plt.show()
